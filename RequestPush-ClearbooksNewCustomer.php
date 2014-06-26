@@ -28,21 +28,21 @@ class RequestPush_ClearbooksNewCustomer{
 	
 	function push($request){
 
-    $clearbooksUrl = 'https://secure.clearbooks.co.uk/';
+		$clearbooksUrl = 'https://secure.clearbooks.co.uk/';
  
-		$client = new SoapClient($clearbooksUrl.'api/wsdl/');
+			$client = new SoapClient($clearbooksUrl.'api/wsdl/');
 		
-		$client->__setSoapHeaders(array(
-			new SoapHeader($clearbooksUrl . 'api/soap/',
-				'authenticate', array('apiKey' => 'apikey')), // Your API key goes here!
-		));
+			$client->__setSoapHeaders(array(
+				new SoapHeader($clearbooksUrl . 'api/soap/',
+					'authenticate', array('apiKey' => 'apikey')), // Your API key goes here!
+			));
 
-	   require_once __DIR__ . '/clearbooks/includes.php';
+		require_once __DIR__ . '/clearbooks/includes.php';
 		
-	  // did we enter a company name into the comments field?
-	    $companyname = $request['staff_comment'];
-	    if(!$request['staff_comment']) $companyname = substr(strrchr(($request['sEmail']), "@"), 1);
-	   
+		// did we enter a company name into the comments field?
+		$companyname = $request['staff_comment'];
+		if(!$request['staff_comment']) $companyname = substr(strrchr(($request['sEmail']), "@"), 1);
+		   
 		// create the entity
 		$entity = new \Clearbooks_Soap_1_0_Entity();
 		$entity->company_name = $companyname;
@@ -50,19 +50,19 @@ class RequestPush_ClearbooksNewCustomer{
 		$entity->email        = $request['sEmail'];
 		$entity->website      = substr(strrchr(($request['sEmail']), "@"), 1);
 		$entity->phone1       = $request[sPhone];
-
+	
 		// indicate that the entity is a customer
 		$entity->customer     = new \Clearbooks_Soap_1_0_EntityExtra();
-		$entity->customer->default_vat_rate = "0.2";
-		$entity->customer->default_credit_terms = "30";
-
+		$entity->customer->default_vat_rate = "0.2";      // it's 20% in the UK, change this if you want
+		$entity->customer->default_credit_terms = "30";   // 30 days of credit by default
+	
 		// now create the entity
 		$entityId = $client->createEntity( $entity );
-
-    $result = "Created customer record <a href='https://secure.clearbooks.co.uk/" . $myClearBooksUserName . "/accounting/contacts/overview/" . $entityId . "/'>" . $entityId .  "</a>.";
-		return $result;
 	
-		}
+		$result = "Created customer record <a href='https://secure.clearbooks.co.uk/" . $myClearBooksUserName . "/accounting/contacts/overview/" . $entityId . "/'>" . $entityId .  "</a>.";
+		return $result;
+		
+	}
 
 
 	function details($id){
